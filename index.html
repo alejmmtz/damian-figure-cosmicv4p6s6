@@ -1,288 +1,51 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>Damián's Cosmic Heart AR - Punk Rock Edition</title>
+<!doctype html>
+<html>
+    <head>
+        <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+        <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+        <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
+        <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
+        <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
+    </head>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&display=swap" rel="stylesheet">
-
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script> <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
-
-    <style>
-        /* --- ESTILOS PUNK ROCK PARA DAMIAN --- */
-        :root {
-            /* Paleta Punk de alto contraste */
-            --punk-yellow: #fff200;    /* Amarillo vibrante estilo Sex Pistols */
-            --punk-pink: #ff0099;      /* Rosa intenso */
-            --grunge-black: #1a1a1a;   /* Negro sucio */
-            --noise-texture: url('https://www.transparenttextures.com/patterns/black-noise.png');
-        }
-
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Bangers', cursive;
-            background-color: var(--grunge-black);
-            -webkit-touch-callout: none; /* Deshabilita el menú contextual al presionar en iOS */
-            -webkit-user-select: none;   /* Deshabilita la selección de texto en iOS */
-            -moz-user-select: none;      /* Deshabilita la selección de texto en Firefox */
-            -ms-user-select: none;       /* Deshabilita la selección de texto en IE/Edge */
-            user-select: none;           /* Deshabilita la selección de texto */
-        }
-
-        /* Pantalla de Carga Estilo Fanzine */
-        #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* Fondo amarillo chillón con textura de ruido */
-            background-color: var(--punk-yellow);
-            background-image: var(--noise-texture);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            color: var(--grunge-black);
-            transition: opacity 0.5s ease-out;
-        }
-        
-        /* Contenedor del texto de carga para darle efecto de papel rasgado */
-        .splash-content {
-            background-color: var(--punk-pink);
-            padding: 30px;
-            border: 5px dashed black; /* Borde estilo costura/recorte */
-            transform: rotate(-3deg); /* Inclinación rebelde */
-            box-shadow: 10px 10px 0px rgba(0,0,0,0.8); /* Sombra dura pop-art */
-            text-align: center; /* Centrar el texto dentro del recuadro */
-        }
-
-        #splash-screen h1 {
-            font-family: 'Permanent Marker', cursive;
-            font-size: 3.5em;
-            margin: 0;
-            text-transform: uppercase;
-            color: white;
-            text-shadow: 3px 3px 0px black;
-        }
-        #splash-screen p {
-            font-size: 1.5em;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        
-        /* Animación del cargador: Un cuadrado caótico */
-        .loader-punk {
-            width: 40px;
-            height: 40px;
-            background-color: black;
-            margin-top: 25px;
-            animation: glitch-spin 0.5s infinite steps(8);
-        }
-        @keyframes glitch-spin {
-            0% { transform: rotate(0deg) scale(1); background-color: black;}
-            25% { transform: rotate(90deg) scale(1.2); background-color: white;}
-            50% { transform: rotate(180deg) scale(0.8); background-color: black;}
-            75% { transform: rotate(270deg) scale(1.4); background-color: var(--punk-yellow);}
-            100% { transform: rotate(360deg) scale(1); background-color: black;}
-        }
-
-        /* Capa de Interfaz de Usuario (HUD) Punk */
-        #ar-hud {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* Permite interacción con el modelo 3D */
-            z-index: 10;
-            /* Viñeta sucia y ruidosa */
-            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.8) 90%);
-            background-image: var(--noise-texture);
-            /* Borde grueso estilo cinta adhesiva */
-            border: 8px solid var(--grunge-black);
-            outline: 4px dashed var(--punk-yellow); /* Doble borde */
-            outline-offset: -15px;
-            box-sizing: border-box;
-        }
-
-        /* Título superior estilo grafiti */
-        .hud-title {
-            position: absolute;
-            top: 25px;
-            width: auto;
-            left: 50%;
-            transform: translateX(-50%) rotate(-2deg); /* Centrado e inclinado */
-            text-align: center;
-            color: var(--punk-yellow);
-            background-color: var(--grunge-black);
-            padding: 5px 20px;
-            font-size: 2em;
-            /* Efecto de rotulador chorreando */
-            text-shadow: 3px 3px 0px var(--punk-pink), -2px -2px 0px black;
-            pointer-events: auto; /* Permite click/toque en el título si se necesitara */
-            font-family: 'Permanent Marker', cursive;
-            border: 3px dashed white;
-        }
-
-        /* Botón de Música estilo Parche/Sticker */
-        #music-control {
-            position: absolute;
-            bottom: 35px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: auto; /* Permite interacción con el botón */
-            /* Estilo de pegatina ruidosa */
-            background-color: var(--punk-pink);
-            color: white;
-            border: 4px solid black;
-            padding: 15px 30px;
-            font-family: 'Permanent Marker', cursive;
-            font-size: 1.4em;
-            cursor: pointer;
-            text-transform: uppercase;
-            /* Sombra dura desplazada para efecto pop-out */
-            box-shadow: 8px 8px 0px var(--grunge-black);
-            transition: all 0.1s;
-            white-space: nowrap; /* Evita que el texto del botón se rompa en varias líneas */
-        }
-        #music-control:active {
-            transform: translateX(-50%) translate(4px, 4px);
-            box-shadow: 4px 4px 0px var(--grunge-black);
-            background-color: var(--punk-yellow);
-            color: black;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="splash-screen">
-        <div class="splash-content">
-            <h1>DAMIAN'S WORLD</h1>
-            <p>Cargando el desastre...</p>
-        </div>
-        <div class="loader-punk"></div>
-    </div>
-
-    <div id="ar-hud">
-        <div class="hud-title">COSMIC SCANNER</div>
-        
-        <audio id="bg-music" loop>
-            <source src="assets/19-2000.mp3" type="audio/mpeg">
-            Tu navegador no soporta el elemento de audio.
-        </audio>
-        
-        <button id="music-control">🎸 PLAY LOUD</button>
-    </div>
-
-    <a-scene
-        vr-mode-ui="enabled: false;"
-        loading-screen="enabled: false;"
-        renderer="logarithmicDepthBuffer: true; alpha: true; antialias: true;"
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; patternRatio: 0.75; cameraParametersUrl: assets/camera_para.dat;"
-        id="scene"
-        embedded
-        gesture-detector
-    >
-        <a-assets timeout="10000"> <a-asset-item
-                id="animated-asset"
-                src="assets/asset.glb"
-            ></a-asset-item>
+    <body style="margin: 0; overflow: hidden;">
+        <a-scene
+            vr-mode-ui="enabled: false;"
+            loading-screen="enabled: false;"
+            renderer="logarithmicDepthBuffer: true;"
+            arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+            id="scene"
+            embedded
+            gesture-detector
+        >
+            <a-assets>
+                <a-asset-item
+                    id="animated-asset"
+                    src="assets/asset.glb"
+                ></a-asset-item>
             </a-assets>
 
-        <a-marker
-            id="animated-marker"
-            type="pattern"
-            preset="custom"
-            url="assets/marker.patt"
-            raycaster="objects: .clickable"
-            emitevents="true"
-            cursor="fuse: false; rayOrigin: mouse;"
-            id="markerA"
-            smooth="true"
-            smoothCount="10"
-            smoothTolerance=".01"
-            smoothThreshold="5"
-        >
-            <a-entity
-                id="damian-model"
-                scale="0.01 0.01 0.01" animation-mixer="loop: repeat"
-                gltf-model="#animated-asset"
-                class="clickable"
-                gesture-handler
-                position="0 0 0" rotation="-90 0 0" >
-            </a-entity>
+            <a-marker
+                id="animated-marker"
+                type="pattern"
+                preset="custom"
+                url="assets/marker.patt"
+                raycaster="objects: .clickable"
+                emitevents="true"
+                cursor="fuse: false; rayOrigin: mouse;"
+                id="markerA"
+            >
+                <a-entity
+                    id="bowser-model"
+                    scale="1 1 1"
+                    animation-mixer="loop: repeat"
+                    gltf-model="#animated-asset"
+                    class="clickable"
+                    gesture-handler
+                ></a-entity>
+            </a-marker>
 
-            <a-entity light="type: ambient; color: #BBB; intensity: 0.7"></a-entity>
-            <a-entity light="type: directional; color: #FFF; intensity: 0.8; target: #damian-model" position="-0.5 1 1"></a-entity>
-            <a-entity light="type: directional; color: #FFF; intensity: 0.5; target: #damian-model" position="0.5 1 -1"></a-entity>
-        </a-marker>
-
-        <a-entity camera></a-entity>
-    </a-scene>
-
-    <script>
-        // --- LÓGICA JAVASCRIPT ---
-        const scene = document.querySelector('a-scene');
-        const splash = document.querySelector('#splash-screen');
-        const musicBtn = document.getElementById('music-control');
-        const music = document.getElementById('bg-music');
-        let isPlaying = false;
-
-        // Ocultar la pantalla de carga una vez que la escena de A-Frame ha cargado
-        scene.addEventListener('loaded', () => {
-             console.log("A-Frame scene loaded. Hiding splash screen.");
-             setTimeout(() => {
-                 splash.style.opacity = '0';
-                 setTimeout(() => { splash.style.display = 'none'; }, 500);
-             }, 2000); // Un pequeño retraso para que el usuario vea la pantalla de carga
-        });
-
-        // Control de reproducción de música
-        musicBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                music.pause();
-                musicBtn.innerText = '🎸 PLAY LOUD';
-            } else {
-                music.play().then(() => {
-                    // La reproducción se inició correctamente
-                    musicBtn.innerText = '🛑 STOP THE NOISE';
-                }).catch(error => {
-                    // Error: el navegador bloqueó la reproducción automática
-                    console.error("Error al reproducir audio:", error);
-                    alert("El navegador bloqueó la reproducción automática de audio. Por favor, toca de nuevo para habilitar la música.");
-                    musicBtn.innerText = '⚠️ AUDIO BLOQUEADO';
-                });
-            }
-            isPlaying = !isPlaying;
-        });
-
-        // Opcional: Escuchar eventos del marcador para depuración
-        const marker = document.querySelector('#animated-marker');
-        marker.addEventListener('markerFound', () => {
-            console.log("¡Marcador 'Damián' encontrado!");
-        });
-        marker.addEventListener('markerLost', () => {
-            console.log("Marcador 'Damián' perdido.");
-        });
-
-        // Debugging para la carga del modelo GLB
-        const modelTarget = document.querySelector('#damian-model');
-        modelTarget.addEventListener('model-loaded', () => {
-            console.log("¡Modelo GLB de Damián cargado correctamente!");
-        });
-        modelTarget.addEventListener('model-error', (event) => {
-            console.error("Error al cargar el modelo GLB:", event.detail.src);
-            alert("Error: No se pudo cargar el modelo 3D. Verifica la ruta 'assets/asset.glb' y el formato del archivo.");
-        });
-    </script>
-</body>
+            <a-entity camera></a-entity>
+        </a-scene>
+    </body>
 </html>
